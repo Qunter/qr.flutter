@@ -496,7 +496,8 @@ class QrPainter extends CustomPainter {
     Canvas canvas,
     _PaintMetrics metrics,
   ) {
-    final totalGap = (_finderPatternLimit - 1) * metrics.gapSize;
+    // 定位点始终保持紧凑，不受间隙设置的影响
+    final totalGap = 0.0;
     final radius =
         ((_finderPatternLimit * metrics.pixelSize) + totalGap) -
             metrics.pixelSize;
