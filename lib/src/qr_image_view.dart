@@ -31,7 +31,7 @@ class QrImageView extends StatefulWidget {
     this.errorCorrectionLevel = QrErrorCorrectLevel.L,
     this.errorStateBuilder,
     this.constrainErrorBounds = true,
-    this.gapless = true,
+    this.gapLevel = QrGapLevel.none,
     this.embeddedImage,
     this.embeddedImageStyle = const QrEmbeddedImageStyle(),
     this.semanticsLabel = 'qr code',
@@ -64,7 +64,7 @@ class QrImageView extends StatefulWidget {
     this.errorCorrectionLevel = QrErrorCorrectLevel.L,
     this.errorStateBuilder,
     this.constrainErrorBounds = true,
-    this.gapless = true,
+    this.gapLevel = QrGapLevel.none,
     this.embeddedImage,
     this.embeddedImageStyle = const QrEmbeddedImageStyle(),
     this.semanticsLabel = 'qr code',
@@ -127,9 +127,11 @@ class QrImageView extends StatefulWidget {
   /// content widget and error widget will adhere to the size value.
   final bool constrainErrorBounds;
 
-  /// If set to false, each of the squares in the QR code will have a small
-  /// gap. Default is true.
-  final bool gapless;
+  /// The gap level between QR code modules.
+  /// - QrGapLevel.none: No gap between modules (gapSize = 0)
+  /// - QrGapLevel.small: Small gap between modules (gapSize = 0.25)
+  /// - QrGapLevel.medium: Medium gap between modules (gapSize = 0.5)
+  final QrGapLevel gapLevel;
 
   /// The image data to embed (as an overlay) in the QR code. The image will
   /// be added to the center of the QR code.
@@ -222,7 +224,7 @@ class _QrImageViewState extends State<QrImageView> {
       qr: _qr!,
       // ignore: deprecated_member_use_from_same_package
       color: widget.foregroundColor,
-      gapless: widget.gapless,
+      gapLevel: widget.gapLevel,
       embeddedImageStyle: widget.embeddedImageStyle,
       embeddedImage: image,
       eyeStyle: widget.eyeStyle,

@@ -7,6 +7,18 @@
 import 'package:flutter/widgets.dart';
 import 'dart:ui';
 
+/// Enumeration representing the gap level between QR code modules.
+enum QrGapLevel {
+  /// No gap between modules (gapSize = 0)
+  none,
+
+  /// Small gap between modules (gapSize = 0.25)
+  small,
+
+  /// Medium gap between modules (gapSize = 0.5)
+  medium,
+}
+
 
 /// Represents a specific element / part of a QR code. This is used to isolate
 /// the different parts so that we can style and modify specific parts

@@ -38,7 +38,7 @@ class QrPainter extends CustomPainter {
       'You should use the background color value of your container widget',
     )
     this.emptyColor = _qrDefaultEmptyColor,
-    this.gapless = false,
+    this.gapLevel = QrGapLevel.none,
     this.embeddedImage,
     this.embeddedImageStyle = const QrEmbeddedImageStyle(),
     this.eyeStyle = const QrEyeStyle(),
@@ -62,7 +62,7 @@ class QrPainter extends CustomPainter {
       'You should use the background color value of your container widget',
     )
     this.emptyColor = _qrDefaultEmptyColor,
-    this.gapless = false,
+    this.gapLevel = QrGapLevel.none,
     this.embeddedImage,
     this.embeddedImageStyle = const QrEmbeddedImageStyle(),
     this.eyeStyle = const QrEyeStyle(),
@@ -92,9 +92,11 @@ class QrPainter extends CustomPainter {
   @Deprecated(
       'You should use the background color value of your container widget')
   final Color emptyColor; // the other color
-  /// If set to false, the painter will leave a 1px gap between each of the
-  /// squares.
-  final bool gapless;
+  /// The gap level between QR code modules.
+  /// - QrGapLevel.none: No gap between modules (gapSize = 0)
+  /// - QrGapLevel.small: Small gap between modules (gapSize = 0.25)
+  /// - QrGapLevel.medium: Medium gap between modules (gapSize = 0.5)
+  final QrGapLevel gapLevel;
 
   /// The image data to embed (as an overlay) in the QR code. The image will
   /// be added to the center of the QR code.
@@ -119,11 +121,20 @@ class QrPainter extends CustomPainter {
   /// requested the 'auto' version.
   late final int _calcVersion;
 
-  /// The size of the 'gap' between the pixels
-  final double _gapSize = 0.25;
-
   /// Cache for all of the [Paint] objects.
   final PaintCache _paintCache = PaintCache();
+  
+  /// Get the gap size based on the gap level
+  double _getGapSize() {
+    switch (gapLevel) {
+      case QrGapLevel.none:
+        return 0;
+      case QrGapLevel.small:
+        return 0.25;
+      case QrGapLevel.medium:
+        return 0.5;
+    }
+  }
 
   void _init(String data) {
     if (!QrVersions.isSupportedVersion(version)) {
@@ -192,7 +203,7 @@ class QrPainter extends CustomPainter {
     final paintMetrics = _PaintMetrics(
       containerSize: size.shortestSide,
       moduleCount: _qr!.moduleCount,
-      gapSize: gapless ? 0 : _gapSize,
+      gapSize: _getGapSize(),
     );
 
     // draw the finder pattern elements
@@ -285,7 +296,7 @@ class QrPainter extends CustomPainter {
       }
     }
 
-    final gap = !gapless ? _gapSize : 0;
+    final gap = _getGapSize();
     // get the painters for the pixel information
     final pixelPaint = _paintCache.firstPaint(QrCodeElement.codePixel);
     pixelPaint!.color = _priorityColor(dataModuleStyle.color);
@@ -443,10 +454,10 @@ class QrPainter extends CustomPainter {
     final top = paintMetrics.inset + (y * (paintMetrics.pixelSize + gap));
     var pixelHTweak = 0.0;
     var pixelVTweak = 0.0;
-    if (gapless && _hasAdjacentHorizontalPixel(x, y, _qr!.moduleCount)) {
+    if (gapLevel == QrGapLevel.none && _hasAdjacentHorizontalPixel(x, y, _qr!.moduleCount)) {
       pixelHTweak = 0.5;
     }
-    if (gapless && _hasAdjacentVerticalPixel(x, y, _qr!.moduleCount)) {
+    if (gapLevel == QrGapLevel.none && _hasAdjacentVerticalPixel(x, y, _qr!.moduleCount)) {
       pixelVTweak = 0.5;
     }
     return Rect.fromLTWH(
@@ -630,7 +641,7 @@ class QrPainter extends CustomPainter {
       return errorCorrectionLevel != oldPainter.errorCorrectionLevel ||
           _calcVersion != oldPainter._calcVersion ||
           _qr != oldPainter._qr ||
-          gapless != oldPainter.gapless ||
+          gapLevel != oldPainter.gapLevel ||
           embeddedImage != oldPainter.embeddedImage ||
           embeddedImageStyle != oldPainter.embeddedImageStyle ||
           eyeStyle != oldPainter.eyeStyle ||
